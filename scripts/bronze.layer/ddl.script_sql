@@ -1,0 +1,60 @@
+/*
+===============================================================================
+DDL Script: Create Bronze Tables
+===============================================================================
+Script Purpose:
+    This script creates tables in the 'bronze' schema, dropping existing tables 
+    if they already exist.
+	  Run this script to re-define the DDL structure of 'bronze' Tables
+===============================================================================
+*/
+
+
+IF OBJECT_ID('bronze.patients', 'U') IS NOT NULL
+DROP TABLE bronze.patients;
+
+CREATE TABLE bronze.patients (
+patient_id NVARCHAR(MAX),
+age	NVARCHAR(MAX),
+gender	NVARCHAR(MAX),
+comorbidity_index NVARCHAR(MAX),
+admission_type NVARCHAR(MAX),
+baseline_risk_score NVARCHAR(MAX),
+los_hours	NVARCHAR(MAX),
+deterioration_event NVARCHAR(MAX),
+deterioration_within_12h_from_admission NVARCHAR(MAX),
+deterioration_hour NVARCHAR(MAX)
+);
+
+IF OBJECT_ID('bronze.vitals_timeseries', 'U') IS NOT NULL
+DROP TABLE bronze.vitals_timeseries;
+
+CREATE TABLE bronze.vitals_timeseries (
+patient_id NVARCHAR(MAX),
+hour_from_admission NVARCHAR(MAX),
+heart_rate	NVARCHAR(MAX),
+respiratory_rate NVARCHAR(MAX),	
+spo2_pct NVARCHAR(MAX),
+temperature_c	NVARCHAR(MAX),
+systolic_bp NVARCHAR(MAX),
+diastolic_bp	NVARCHAR(MAX),
+oxygen_device	NVARCHAR(MAX),
+oxygen_flow NVARCHAR(MAX),
+mobility_score NVARCHAR(MAX),
+nurse_alert NVARCHAR(MAX)
+);
+
+
+IF OBJECT_ID('bronze.labs_timeseries', 'U') IS NOT NULL
+DROP TABLE bronze.labs_timeseries;
+
+CREATE TABLE bronze.labs_timeseries (
+patient_id NVARCHAR(MAX),
+hour_from_admission NVARCHAR(MAX),
+wbc_count NVARCHAR(MAX),
+lactate NVARCHAR(MAX),
+creatinine NVARCHAR(MAX),
+crp_level NVARCHAR(MAX),
+hemoglobin NVARCHAR(MAX),
+sepsis_risk_score NVARCHAR(MAX)
+);
