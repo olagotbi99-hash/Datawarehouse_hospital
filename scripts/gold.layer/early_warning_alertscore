@@ -1,0 +1,47 @@
+/*
+===============================================================================
+DDL Script: Create Gold Views
+===============================================================================
+Script Purpose:
+ Calculate a "Deterioration Score" based on vital signs.
+===============================================================================
+*/
+
+CREATE VIEW gold.patients_early_warning_alerts AS 
+WITH scoredVitals AS (
+SELECT 
+patient_id,
+hour_from_admission,
+heart_rate,
+spo2_pct,
+sepsis_risk_score,
+CASE
+    WHEN heart_rate < 40 OR heart_rate > 130 THEN 3
+    WHEN heart_rate BETWEEN 111 AND 130 THEN 2
+    WHEN heart_rate BETWEEN 91 AND 110 THEN 1
+    ELSE 0
+END AS hr_points,
+CASE
+    WHEN spo2_pct < 92 THEN 3
+    WHEN spo2_pct BETWEEN 92 AND 93 THEN 2
+    WHEN spo2_pct BETWEEN 94 AND 95 THEN 1
+    ELSE 0
+END AS spo2_points,
+CASE
+    WHEN sepsis_risk_score > 0.8 THEN 5
+    WHEN sepsis_risk_score > 0.5 THEN 2
+    WHEN sepsis_risk_score BETWEEN 94 AND 95 THEN 1
+    ELSE 0
+END AS spesis_points
+FROM gold.master_patient_monitoring
+)
+SELECT *,
+( hr_points + spo2_points + spesis_points) AS total_ews_score,
+CASE
+    WHEN ( hr_points + spo2_points + spesis_points) >= 5 THEN 'RED ALERT'
+    WHEN ( hr_points + spo2_points + spesis_points) BETWEEN 3 AND 4 THEN 'YELLOW'
+    ELSE 'GREEN'
+END AS clinical_status
+FROM scoredVitals;
+
+
