@@ -1,0 +1,62 @@
+/*
+===============================================================================
+DDL Script: Create Silver Tables
+===============================================================================
+Script Purpose:
+    This script creates tables in the 'silver' schema, dropping existing tables 
+    if they already exist.
+	  Run this script to re-define the DDL structure of 'bronze' Tables
+===============================================================================
+*/
+
+
+IF OBJECT_ID('silver.patients', 'U') IS NOT NULL
+DROP TABLE silver.patients;
+
+CREATE TABLE silver.patients (
+patient_id INT,
+age	INT,
+gender	NVARCHAR(MAX),
+comorbidity_index INT,
+admission_type NVARCHAR(MAX),
+baseline_risk_score DECIMAL(10,4),
+los_hours	INT,
+deterioration_event INT,
+deterioration_within_12h_from_admission INT,
+deterioration_hour INT
+);
+
+IF OBJECT_ID('silver.vitals_timeseries', 'U') IS NOT NULL
+DROP TABLE silver.vitals_timeseries;
+
+CREATE TABLE silver.vitals_timeseries (
+patient_id INT,
+hour_from_admission INT,
+heart_rate	DECIMAL(5,2),
+respiratory_rate DECIMAL(5,2) ,	
+spo2_pct DECIMAL(5,2),
+temperature_c	DECIMAL(5,2),
+systolic_bp DECIMAL(5,2),
+diastolic_bp DECIMAL(5,2),
+oxygen_device NVARCHAR(50),
+oxygen_flow NVARCHAR(50),
+mobility_score INT,
+nurse_alert INT
+);
+
+
+IF OBJECT_ID('silver.labs_timeseries', 'U') IS NOT NULL
+DROP TABLE silver.labs_timeseries;
+
+CREATE TABLE silver.labs_timeseries (
+patient_id INT,
+hour_from_admission INT,
+wbc_count DECIMAL(5,2),
+lactate DECIMAL(5,2),
+creatinine DECIMAL(5,2),
+crp_level DECIMAL(5,2),
+hemoglobin DECIMAL(5,2),
+sepsis_risk_score DECIMAL(10,4)
+);
+
+
