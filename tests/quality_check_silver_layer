@@ -1,0 +1,102 @@
+/*
+===============================================================================
+Quality Checks
+===============================================================================
+Script Purpose:
+    This script performs various quality checks for data consistency, accuracy, 
+    and standardization across the 'silver' layer. It includes checks for:
+    - Null or duplicate primary keys.
+    - Unwanted spaces in string fields.
+    - Data standardization and consistency.
+
+Usage Notes:
+    - Run these checks after data loading Silver Layer.
+    - Investigate and resolve any discrepancies found during the checks.
+===============================================================================
+*/
+
+-- ====================================================================
+-- Checking 'silver.patients'
+-- ====================================================================
+-- Check for NULLs or Duplicates in Primary Key
+-- Expectation: No Results
+
+SELECT patient_id, COUNT(*)
+FROM silver.patients
+GROUP BY patient_id
+HAVING COUNT(*) > 1 OR patient_id IS NULL;
+
+-- Check for Unwanted Spaces
+-- Expectation: No Results
+SELECT 
+    patient_id 
+FROM silver.patients
+WHERE patient_id != TRIM(patient_id);
+
+-- Data Standardization & Consistency
+
+SELECT DISTINCT gender
+FROM silver.patients;
+
+
+-- ====================================================================
+-- Checking 'silver.vitals_timeseries'
+-- ====================================================================
+-- Check for NULLs in Primary Key
+-- Expectation: No Results
+
+SELECT patient_id
+FROM silver.vitals_timeseries
+WHERE patient_id IS NULL;
+
+-- Check for Unwanted Spaces
+-- Expectation: No Results
+SELECT 
+    patient_id 
+FROM silver.vitals_timeseries
+WHERE patient_id != TRIM(patient_id);
+
+
+-- ====================================================================
+-- Checking 'silver.labs_timeseries'
+-- ====================================================================
+-- Check for NULLs in Primary Key
+-- Expectation: No Results
+
+SELECT patient_id
+FROM silver.labs_timeseries
+WHERE patient_id IS NULL;
+
+-- Check for Unwanted Spaces
+-- Expectation: No Results
+SELECT 
+    patient_id 
+FROM silver.labs_timeseries
+WHERE patient_id != TRIM(patient_id);
+
+-- Check for hidden characters
+-- Expectation: No Results
+
+SELECT TOP 10 
+  sepsis_risk_score, 
+  LEN(sepsis_risk_score) AS actual_length,
+  CAST(sepsis_risk_score AS VARBINARY(MAX)) AS hex_value 
+FROM silver.labs_timeseries
+WHERE TRY_CAST(TRIM(sepsis_risk_score) AS DECIMAL(10,4)) IS NULL
+AND sepsis_risk_score IS NOT NULL;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
