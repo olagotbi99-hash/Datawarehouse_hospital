@@ -1,0 +1,27 @@
+/*
+===============================================================================
+DDL Script: Create Gold Views
+===============================================================================
+Script Purpose:
+to perform Trend Analysis
+to Detect rapid clinical decline over time.
+===============================================================================
+*/
+
+CREATE OR ALTER VIEW gold.vitals_trend_analysis AS
+WITH bp_compare AS (
+SELECT 
+patient_id,
+hour_from_admission,
+systolic_bp AS current_systolic_bp,
+LAG(systolic_bp,6) OVER( PARTITION BY patient_id ORDER BY hour_from_admission) AS previous_systolic_bp
+FROM silver.vitals_timeseries
+)
+SELECT 
+patient_id,
+hour_from_admission,
+current_systolic_bp,
+previous_systolic_bp,
+ROUND(((COALESCE(previous_systolic_bp,current_systolic_bp) - current_systolic_bp) / NULLIF(COALESCE(previous_systolic_bp,current_systolic_bp), 0)*100), 2) AS bp_drop_percentage
+FROM bp_compare;
+
