@@ -1,0 +1,24 @@
+
+CREATE VIEW gold.master_patient_monitoring AS
+SELECT 
+    p.patient_id,
+    p.age,
+    p.gender,
+    v.hour_from_admission,
+    v.heart_rate,
+    v.temperature_c,
+    v.spo2_pct,
+    l.wbc_count,
+    l.lactate,
+    l.sepsis_risk_score,
+    -- Clinical Logic: Flagging Tachycardia
+    CASE 
+        WHEN v.heart_rate > 100 THEN 1 
+        ELSE 0 
+    END AS high_hr_flag
+FROM silver.patients p
+LEFT JOIN silver.vitals_timeseries v 
+    ON p.patient_id = v.patient_id
+LEFT JOIN silver.labs_timeseries l 
+    ON v.patient_id = l.patient_id 
+    AND v.hour_from_admission = l.hour_from_admission;
